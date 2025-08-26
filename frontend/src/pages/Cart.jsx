@@ -1,134 +1,62 @@
-import React, { useEffect } from 'react';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { showNotification } from '../utils/notification';
+import { useCart } from '../context/CartContext';
+import CartItem from '../components/cart/CartItem';
+import CartSummary from '../components/cart/CartSummary';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const Cart = () => {
-  const { items, loading, error, total, updateQuantity, removeFromCart, fetchCart } = useCart();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
-
-  const handleQuantityChange = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
-    await updateQuantity(itemId, newQuantity);
-  };
-
-  const handleRemoveItem = async (itemId) => {
-    await removeFromCart(itemId);
-    showNotification('Item removed from cart', 'success');
-  };
+  const { items, loading, error } = useCart();
 
   if (loading) {
-    return (
-      <div className="container">
-        <div className="loading">Loading cart...</div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
     return (
-      <div className="container">
-        <div className="error">{error}</div>
+      <div className="container mx-auto px-4 py-8 text-center">
+        <div className="text-red-500 text-xl mb-4">{error}</div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="bg-primary text-white px-6 py-2 rounded-lg"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="container">
-      <div className="cart-page">
-        <h1>Shopping Cart</h1>
-        
-        {items.length === 0 ? (
-          <div className="empty-cart">
-            <h2>Your cart is empty</h2>
-            <p>Start shopping to add items to your cart</p>
-            <Link to="/" className="btn-primary">
-              Continue Shopping
-            </Link>
-          </div>
-        ) : (
-          <div className="cart-content">
-            <div className="cart-items">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+      
+      {items.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-gray-400 text-6xl mb-4">🛒</div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Your cart is empty</h3>
+          <p className="text-gray-500 mb-6">Start shopping to add items to your cart</p>
+          <Link
+            to="/men"
+            className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary transition-colors"
+          >
+            Start Shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow-md">
               {items.map((item) => (
-                <div key={item._id} className="cart-item">
-                  <img 
-                    src={item.product?.images?.[0]?.url || '/placeholder-image.jpg'} 
-                    alt={item.product?.name}
-                    className="cart-item-image"
-                  />
-                  
-                  <div className="cart-item-details">
-                    <h3>{item.product?.name}</h3>
-                    <p className="cart-item-price">₹{item.price}</p>
-                    <p className="cart-item-category">{item.product?.category}</p>
-                  </div>
-                  
-                  <div className="cart-item-quantity">
-                    <button
-                      onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
-                      disabled={item.quantity <= 1}
-                    >
-                      -
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button
-                      onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  
-                  <div className="cart-item-total">
-                    ₹{(item.price * item.quantity).toFixed(2)}
-                  </div>
-                  
-                  <button
-                    onClick={() => handleRemoveItem(item._id)}
-                    className="remove-btn"
-                  >
-                    Remove
-                  </button>
-                </div>
+                <CartItem key={item._id} item={item} />
               ))}
             </div>
-            
-            <div className="cart-summary">
-              <h2>Order Summary</h2>
-              <div className="summary-item">
-                <span>Subtotal</span>
-                <span>₹{total.toFixed(2)}</span>
-              </div>
-              <div className="summary-item">
-                <span>Shipping</span>
-                <span>₹{total > 0 ? 50 : 0}</span>
-              </div>
-              <div className="summary-item total">
-                <span>Total</span>
-                <span>₹{(total + (total > 0 ? 50 : 0)).toFixed(2)}</span>
-              </div>
-              
-              {user ? (
-                <Link to="/checkout" className="btn-primary checkout-btn">
-                  Proceed to Checkout
-                </Link>
-              ) : (
-                <Link to="/login" className="btn-primary checkout-btn">
-                  Login to Checkout
-                </Link>
-              )}
-              
-              <Link to="/" className="continue-shopping">
-                Continue Shopping
-              </Link>
-            </div>
           </div>
-        )}
-      </div>
+          
+          <div>
+            <CartSummary />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

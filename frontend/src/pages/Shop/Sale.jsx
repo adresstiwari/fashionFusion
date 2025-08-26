@@ -1,19 +1,70 @@
-// src/pages/Shop/Sale.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useProduct } from '../../context/ProductContext';
 import ProductGrid from '../../components/product/ProductGrid';
 import ProductFilter from '../../components/product/ProductFilter';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const Sale = () => {
-  const { products, loading, filters, fetchProducts, setFilters } = useProduct();
+  const { products, loading, fetchProducts } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filters, setFilters] = useState({
+    onSale: true,
+    priceRange: [0, 1000],
+    sizes: [],
+    colors: [],
+    sort: 'newest'
+  });
 
   useEffect(() => {
-    fetchProducts({ ...filters, onSale: true });
-  }, [filters]);
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    let saleProducts = products.filter(product => 
+      product.originalPrice && product.originalPrice > product.price
+    );
+
+    saleProducts = saleProducts.filter(product => 
+      product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
+    );
+
+    if (filters.sizes.length > 0) {
+      saleProducts = saleProducts.filter(product =>
+        product.sizes && product.sizes.some(size => filters.sizes.includes(size))
+      );
+    }
+
+    if (filters.colors.length > 0) {
+      saleProducts = saleProducts.filter(product =>
+        product.colors && product.colors.some(color => filters.colors.includes(color))
+      );
+    }
+
+    saleProducts.sort((a, b) => {
+      switch (filters.sort) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'rating':
+          return (b.rating?.average || 0) - (a.rating?.average || 0);
+        case 'discount':
+          const discountA = ((a.originalPrice - a.price) / a.originalPrice) * 100;
+          const discountB = ((b.originalPrice - b.price) / b.originalPrice) * 100;
+          return discountB - discountA;
+        case 'newest':
+        default:
+          return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+    });
+
+    setFilteredProducts(saleProducts);
+  }, [products, filters]);
 
   const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters, page: 1 });
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
   const handleClearFilters = () => {
@@ -22,9 +73,7 @@ const Sale = () => {
       priceRange: [0, 1000],
       sizes: [],
       colors: [],
-      sort: 'newest',
-      page: 1,
-      limit: 12
+      sort: 'newest'
     });
   };
 
@@ -36,7 +85,6 @@ const Sale = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar with Filters */}
         <div className="lg:block">
           <ProductFilter
             filters={filters}
@@ -45,11 +93,10 @@ const Sale = () => {
           />
         </div>
 
-        {/* Products Grid */}
         <div className="lg:col-span-3">
           <div className="flex justify-between items-center mb-6">
             <p className="text-gray-600">
-              Showing {products.length} products on sale
+              Showing {filteredProducts.length} products on sale
             </p>
             
             <select
@@ -69,7 +116,7 @@ const Sale = () => {
           {loading ? (
             <LoadingSpinner />
           ) : (
-            <ProductGrid products={products} />
+            <ProductGrid products={filteredProducts} />
           )}
         </div>
       </div>

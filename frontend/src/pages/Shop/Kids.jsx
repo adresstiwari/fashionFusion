@@ -1,29 +1,75 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useProduct } from '../../context/ProductContext';
 import ProductGrid from '../../components/product/ProductGrid';
 import ProductFilter from '../../components/product/ProductFilter';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const Kids = () => {
-  const { products, loading, filters, fetchProducts, setFilters } = useProduct();
+  const { products, loading, fetchProducts } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filters, setFilters] = useState({
+    category: 'kids',
+    priceRange: [0, 1000],
+    sizes: [],
+    colors: [],
+    sort: 'newest'
+  });
 
   useEffect(() => {
-    fetchProducts({ ...filters, category: 'kids' });
-  }, [filters]);
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    let kidsProducts = products.filter(product => 
+      product.category && product.category.toLowerCase() === 'kids'
+    );
+
+    kidsProducts = kidsProducts.filter(product => 
+      product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
+    );
+
+    if (filters.sizes.length > 0) {
+      kidsProducts = kidsProducts.filter(product =>
+        product.sizes && product.sizes.some(size => filters.sizes.includes(size))
+      );
+    }
+
+    if (filters.colors.length > 0) {
+      kidsProducts = kidsProducts.filter(product =>
+        product.colors && product.colors.some(color => filters.colors.includes(color))
+      );
+    }
+
+    kidsProducts.sort((a, b) => {
+      switch (filters.sort) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'rating':
+          return (b.rating?.average || 0) - (a.rating?.average || 0);
+        case 'newest':
+        default:
+          return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+    });
+
+    setFilteredProducts(kidsProducts);
+  }, [products, filters]);
 
   const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters, page: 1 });
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
   const handleClearFilters = () => {
     setFilters({
       category: 'kids',
-      priceRange: [0, 500],
+      priceRange: [0, 1000],
       sizes: [],
       colors: [],
-      sort: 'newest',
-      page: 1,
-      limit: 12
+      sort: 'newest'
     });
   };
 
@@ -31,10 +77,10 @@ const Kids = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Kids' Collection</h1>
+        <p className="text-gray-600">{filteredProducts.length} products</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar with Filters */}
         <div className="lg:block">
           <ProductFilter
             filters={filters}
@@ -43,11 +89,10 @@ const Kids = () => {
           />
         </div>
 
-        {/* Products Grid */}
         <div className="lg:col-span-3">
           <div className="flex justify-between items-center mb-6">
             <p className="text-gray-600">
-              Showing {products.length} products
+              Showing {filteredProducts.length} products
             </p>
             
             <select
@@ -66,7 +111,7 @@ const Kids = () => {
           {loading ? (
             <LoadingSpinner />
           ) : (
-            <ProductGrid products={products} />
+            <ProductGrid products={filteredProducts} />
           )}
         </div>
       </div>

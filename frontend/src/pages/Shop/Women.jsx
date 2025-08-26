@@ -1,19 +1,66 @@
-// src/pages/Shop/Women.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useProduct } from '../../context/ProductContext';
 import ProductGrid from '../../components/product/ProductGrid';
 import ProductFilter from '../../components/product/ProductFilter';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const Women = () => {
-  const { products, loading, filters, fetchProducts, setFilters } = useProduct();
+  const { products, loading, fetchProducts } = useProduct();
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [filters, setFilters] = useState({
+    category: 'women',
+    priceRange: [0, 1000],
+    sizes: [],
+    colors: [],
+    sort: 'newest'
+  });
 
   useEffect(() => {
-    fetchProducts({ ...filters, category: 'women' });
-  }, [filters]);
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    let womenProducts = products.filter(product => 
+      product.category && product.category.toLowerCase() === 'women'
+    );
+
+    womenProducts = womenProducts.filter(product => 
+      product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
+    );
+
+    if (filters.sizes.length > 0) {
+      womenProducts = womenProducts.filter(product =>
+        product.sizes && product.sizes.some(size => filters.sizes.includes(size))
+      );
+    }
+
+    if (filters.colors.length > 0) {
+      womenProducts = womenProducts.filter(product =>
+        product.colors && product.colors.some(color => filters.colors.includes(color))
+      );
+    }
+
+    womenProducts.sort((a, b) => {
+      switch (filters.sort) {
+        case 'price-low':
+          return a.price - b.price;
+        case 'price-high':
+          return b.price - a.price;
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'rating':
+          return (b.rating?.average || 0) - (a.rating?.average || 0);
+        case 'newest':
+        default:
+          return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+    });
+
+    setFilteredProducts(womenProducts);
+  }, [products, filters]);
 
   const handleFilterChange = (newFilters) => {
-    setFilters({ ...filters, ...newFilters, page: 1 });
+    setFilters(prev => ({ ...prev, ...newFilters }));
   };
 
   const handleClearFilters = () => {
@@ -22,9 +69,7 @@ const Women = () => {
       priceRange: [0, 1000],
       sizes: [],
       colors: [],
-      sort: 'newest',
-      page: 1,
-      limit: 12
+      sort: 'newest'
     });
   };
 
@@ -32,10 +77,10 @@ const Women = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Women's Collection</h1>
+        <p className="text-gray-600">{filteredProducts.length} products</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Sidebar with Filters */}
         <div className="lg:block">
           <ProductFilter
             filters={filters}
@@ -44,11 +89,10 @@ const Women = () => {
           />
         </div>
 
-        {/* Products Grid */}
         <div className="lg:col-span-3">
           <div className="flex justify-between items-center mb-6">
             <p className="text-gray-600">
-              Showing {products.length} products
+              Showing {filteredProducts.length} products
             </p>
             
             <select
@@ -67,7 +111,7 @@ const Women = () => {
           {loading ? (
             <LoadingSpinner />
           ) : (
-            <ProductGrid products={products} />
+            <ProductGrid products={filteredProducts} />
           )}
         </div>
       </div>

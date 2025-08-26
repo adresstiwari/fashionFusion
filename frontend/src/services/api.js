@@ -1,17 +1,15 @@
 import axios from 'axios';
-
-// Use environment variable with fallback for development
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+import { config } from '../config/environment';
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: config.apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 second timeout
+  timeout: 10000,
 });
 
-// Request interceptor to add auth token
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -25,25 +23,16 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle common errors
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
-      window.location.href = '/login';
-    } else if (error.response?.status === 404) {
-      // Not found - show appropriate message
-      console.error('Resource not found:', error.config.url);
-    } else if (error.code === 'ECONNABORTED') {
-      // Request timeout
-      console.error('Request timeout:', error.config.url);
-    } else if (!error.response) {
-      // Network error
-      console.error('Network error - please check your connection');
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
-    
     return Promise.reject(error);
   }
 );

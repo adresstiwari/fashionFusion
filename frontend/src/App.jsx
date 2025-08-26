@@ -31,6 +31,7 @@ import Addresses from './pages/User/Addresses';
 import Wishlist from './pages/User/Wishlist';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
+import SizeGuide from './pages/SizeGuide';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -44,6 +45,8 @@ import UserDetails from './pages/admin/Users/UserDetails';
 import CategoryList from './pages/admin/Categories/CategoryList';
 import AddCategory from './pages/admin/Categories/AddCategory';
 import SalesReport from './pages/admin/Analytics/SalesReport';
+
+
 
 function App() {
   return (
@@ -71,6 +74,14 @@ function App() {
                       <Route path="/cart" element={<Cart />} />
                       <Route path="/contact" element={<Contact />} />
                       <Route path="/faq" element={<FAQ />} />
+
+                      <Route path="/shop" element={<Men />} />
+                      <Route path="/shop/men" element={<Men />} />
+                      <Route path="/shop/women" element={<Women />} />
+                      <Route path="/shop/kids" element={<Kids />} />
+                      <Route path="/shop/sale" element={<Sale />} />
+                      <Route path="/size-guide" element={<SizeGuide />} />
+ 
                       
                       {/* Protected Routes */}
                       <Route path="/checkout" element={

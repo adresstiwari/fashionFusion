@@ -5,6 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useNotification } from '../../context/NotificationContext';
 import { productService } from '../../services/productService';
+import { getProductImage } from '../../utils/images';
+import { formatPrice } from '../../utils/currency';
 
 const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -66,7 +68,7 @@ const ProductCard = ({ product }) => {
     <div className="group bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
       <Link to={`/product/${product._id}`} className="block relative overflow-hidden">
         <img
-          src={product.images[0]?.url || '/api/placeholder/300/400'}
+          src={getProductImage(product.images[0]?.url)}
           alt={product.name}
           className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
         />
@@ -109,11 +111,11 @@ const ProductCard = ({ product }) => {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-lg font-bold text-primary">
-              ${product.price}
+              {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
               <span className="text-gray-600 text-sm line-through ml-2">
-                ${product.originalPrice}
+                {formatPrice(product.originalPrice)}
               </span>
             )}
           </div>

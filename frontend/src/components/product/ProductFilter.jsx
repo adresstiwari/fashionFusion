@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { Filter, X } from 'lucide-react';
 
-const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
+const ProductFilter = ({ filters = {}, onFilterChange, onClearFilters }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Ensure filters object has all required properties with defaults
+  const safeFilters = {
+    categories: filters?.categories || [],   // updated for multiple categories
+    priceRange: filters?.priceRange || [0, 1000],
+    sizes: filters?.sizes || [],
+    colors: filters?.colors || [],
+    sort: filters?.sort || 'newest',
+    ...filters
+  };
 
   const categories = [
     { value: 'men', label: 'Men' },
@@ -21,33 +31,44 @@ const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
     { value: 'rating', label: 'Rating' }
   ];
 
+  // --- Updated category change logic for multiple selections ---
   const handleCategoryChange = (category) => {
-    onFilterChange({ category: filters.category === category ? '' : category });
+    let newCategories;
+    if (safeFilters.categories.includes(category)) {
+      newCategories = safeFilters.categories.filter(c => c !== category);
+    } else {
+      newCategories = [...safeFilters.categories, category];
+    }
+    onFilterChange?.({ categories: newCategories });
   };
 
   const handleSizeChange = (size) => {
-    const newSizes = filters.sizes.includes(size)
-      ? filters.sizes.filter(s => s !== size)
-      : [...filters.sizes, size];
-    onFilterChange({ sizes: newSizes });
+    const newSizes = safeFilters.sizes.includes(size)
+      ? safeFilters.sizes.filter(s => s !== size)
+      : [...safeFilters.sizes, size];
+    onFilterChange?.({ sizes: newSizes });
   };
 
   const handleColorChange = (color) => {
-    const newColors = filters.colors.includes(color)
-      ? filters.colors.filter(c => c !== color)
-      : [...filters.colors, color];
-    onFilterChange({ colors: newColors });
+    const newColors = safeFilters.colors.includes(color)
+      ? safeFilters.colors.filter(c => c !== color)
+      : [...safeFilters.colors, color];
+    onFilterChange?.({ colors: newColors });
   };
 
   const handlePriceChange = (min, max) => {
-    onFilterChange({ priceRange: [min, max] });
+    onFilterChange?.({ priceRange: [min, max] });
   };
 
   const handleSortChange = (sort) => {
-    onFilterChange({ sort });
+    onFilterChange?.({ sort });
   };
 
-  const hasActiveFilters = filters.category || filters.sizes.length > 0 || filters.colors.length > 0 || filters.priceRange[0] > 0 || filters.priceRange[1] < 1000;
+  const hasActiveFilters = safeFilters.categories.length > 0 || 
+                          safeFilters.sizes.length > 0 || 
+                          safeFilters.colors.length > 0 || 
+                          safeFilters.priceRange[0] > 0 || 
+                          safeFilters.priceRange[1] < 1000;
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -70,7 +91,7 @@ const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
               <label key={category.value} className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={filters.category === category.value}
+                  checked={safeFilters.categories.includes(category.value)}
                   onChange={() => handleCategoryChange(category.value)}
                   className="rounded border-gray-300 text-primary focus:ring-primary"
                 />
@@ -88,13 +109,13 @@ const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
               type="range"
               min="0"
               max="1000"
-              value={filters.priceRange[1]}
-              onChange={(e) => handlePriceChange(filters.priceRange[0], parseInt(e.target.value))}
+              value={safeFilters.priceRange[1]}
+              onChange={(e) => handlePriceChange(safeFilters.priceRange[0], parseInt(e.target.value))}
               className="w-full"
             />
             <div className="flex justify-between text-sm text-gray-600">
-              <span>${filters.priceRange[0]}</span>
-              <span>${filters.priceRange[1]}</span>
+              <span>${safeFilters.priceRange[0]}</span>
+              <span>${safeFilters.priceRange[1]}</span>
             </div>
           </div>
         </div>
@@ -108,7 +129,7 @@ const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
                 key={size}
                 onClick={() => handleSizeChange(size)}
                 className={`px-3 py-1 rounded border text-sm transition-colors ${
-                  filters.sizes.includes(size)
+                  safeFilters.sizes.includes(size)
                     ? 'border-primary bg-primary text-white'
                     : 'border-gray-300 hover:border-primary'
                 }`}
@@ -128,7 +149,7 @@ const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
                 key={color}
                 onClick={() => handleColorChange(color)}
                 className={`px-3 py-1 rounded border text-sm transition-colors ${
-                  filters.colors.includes(color)
+                  safeFilters.colors.includes(color)
                     ? 'border-primary bg-primary text-white'
                     : 'border-gray-300 hover:border-primary'
                 }`}
@@ -143,7 +164,7 @@ const ProductFilter = ({ filters, onFilterChange, onClearFilters }) => {
         <div>
           <h4 className="font-medium mb-3">Sort By</h4>
           <select
-            value={filters.sort}
+            value={safeFilters.sort}
             onChange={(e) => handleSortChange(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:ring-primary focus:border-primary"
           >

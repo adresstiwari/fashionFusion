@@ -13,22 +13,39 @@ const AddProduct = () => {
   const navigate = useNavigate();
 
   const handleImageUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
+  const files = Array.from(e.target.files);
+  if (files.length === 0) return;
 
-    setUploading(true);
-    try {
-      const uploadedImages = await Promise.all(
-        files.map(file => adminService.uploadImage(file))
-      );
-      setImages(prev => [...prev, ...uploadedImages]);
-      toast.success('Image(s) uploaded successfully');
-    } catch (error) {
-      toast.error('Failed to upload images');
-    } finally {
-      setUploading(false);
-    }
-  };
+  setUploading(true);
+  try {
+    // Create a FormData object for each file
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+
+    // Upload to your backend
+    const response = await api.post('/upload/images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+
+    setImages(prev => [...prev, ...response.data]);
+    addNotification({
+      type: 'success',
+      message: 'Images uploaded successfully!'
+    });
+  } catch (error) {
+    console.error('Image upload failed:', error);
+    addNotification({
+      type: 'error',
+      message: 'Failed to upload images'
+    });
+  } finally {
+    setUploading(false);
+  }
+};
 
   const removeImage = (index) => {
     setImages(prev => prev.filter((_, i) => i !== index));
