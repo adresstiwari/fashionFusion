@@ -3,9 +3,12 @@ import { showNotification } from '../utils/notification';
 
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Comes from Netlify env variable
-  withCredentials: true, // ✅ ensures cookies (auth/session) are sent
+  baseURL: import.meta.env.VITE_API_BASE_URL,  
+  withCredentials: true,
 });
+
+
+
 
 // Request interceptor to add auth token
 API.interceptors.request.use((config) => {
