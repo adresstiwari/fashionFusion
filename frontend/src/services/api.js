@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { showNotification } from '../utils/notification';
 
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL, // Comes from Netlify env variable
+  withCredentials: true, // ✅ ensures cookies (auth/session) are sent
 });
 
 // Request interceptor to add auth token
