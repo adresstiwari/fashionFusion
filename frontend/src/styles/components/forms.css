@@ -1,0 +1,96 @@
+@layer components {
+  /* Form container */
+  .form-container {
+    @apply space-y-6;
+  }
+
+  /* Form group */
+  .form-group {
+    @apply space-y-2;
+  }
+
+  /* Form label */
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+
+  /* Form input */
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  }
+
+  .form-input-error {
+    @apply border-red-500 focus:ring-red-500 focus:border-red-500;
+  }
+
+  /* Form textarea */
+  .form-textarea {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical;
+  }
+
+  /* Form select */
+  .form-select {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white;
+  }
+
+  /* Form checkbox */
+  .form-checkbox {
+    @apply h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded;
+  }
+
+  /* Form radio */
+  .form-radio {
+    @apply h-4 w-4 text-primary focus:ring-primary border-gray-300;
+  }
+
+  /* Form error message */
+  .form-error {
+    @apply text-red-600 text-sm mt-1;
+  }
+
+  /* Form help text */
+  .form-help {
+    @apply text-gray-500 text-sm mt-1;
+  }
+
+  /* Form field with icon */
+  .form-field-with-icon {
+    @apply relative;
+  }
+
+  .form-field-icon {
+    @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400;
+  }
+
+  .form-field-with-icon .form-input {
+    @apply pl-10;
+  }
+
+  /* Form actions */
+  .form-actions {
+    @apply flex justify-end space-x-3 pt-6;
+  }
+
+  /* Form section */
+  .form-section {
+    @apply bg-white rounded-lg shadow-md p-6;
+  }
+
+  .form-section-title {
+    @apply text-lg font-medium text-gray-900 mb-4;
+  }
+
+  /* Inline form */
+  .form-inline {
+    @apply flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3;
+  }
+
+  /* Validation states */
+  .form-input-valid {
+    @apply border-green-500 focus:ring-green-500 focus:border-green-500;
+  }
+
+  .form-input-warning {
+    @apply border-yellow-500 focus:ring-yellow-500 focus:border-yellow-500;
+  }
+}

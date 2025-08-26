@@ -1,0 +1,83 @@
+@layer components {
+  /* Base button styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Button sizes */
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm;
+  }
+
+  .btn-md {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-secondary focus:ring-primary;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-primary focus:ring-secondary;
+  }
+
+  .btn-outline {
+    @apply border border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary;
+  }
+
+  .btn-ghost {
+    @apply text-gray-700 hover:bg-gray-100 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+  }
+
+  .btn-warning {
+    @apply bg-yellow-600 text-white hover:bg-yellow-700 focus:ring-yellow-500;
+  }
+
+  /* Button with icons */
+  .btn-icon {
+    @apply p-2;
+  }
+
+  .btn-with-icon {
+    @apply inline-flex items-center space-x-2;
+  }
+
+  /* Loading state */
+  .btn-loading {
+    @apply opacity-70 cursor-not-allowed;
+  }
+
+  /* Button groups */
+  .btn-group {
+    @apply inline-flex rounded-md shadow-sm;
+  }
+
+  .btn-group .btn:not(:first-child) {
+    @apply -ml-px;
+  }
+
+  .btn-group .btn:first-child {
+    @apply rounded-r-none;
+  }
+
+  .btn-group .btn:last-child {
+    @apply rounded-l-none;
+  }
+
+  .btn-group .btn:not(:first-child):not(:last-child) {
+    @apply rounded-none;
+  }
+}
