@@ -1,164 +1,164 @@
+// src/pages/Contact.jsx
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService.js';
-import { Eye, EyeOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const ResetPassword = () => {
-  const { token } = useParams();
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: ''
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const Contact = () => {
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    
-    if (errors[e.target.name]) {
-      setErrors({
-        ...errors,
-        [e.target.name]: ''
-      });
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-
+  const onSubmit = async (data) => {
     setLoading(true);
-
     try {
-      await authService.resetPassword(token, formData.password);
-      toast.success('Password reset successfully!');
-      navigate('/login');
+      // In a real app, you would send this data to your backend
+      console.log('Contact form data:', data);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Message sent successfully! We will get back to you soon.');
+      reset();
     } catch (error) {
-      toast.error('Failed to reset password. The link may have expired.');
+      toast.error('Failed to send message. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Contact Us</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Contact Form */}
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Reset your password
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your new password below.
-          </p>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                New Password
-              </label>
-              <div className="mt-1 relative">
+          <h2 className="text-2xl font-semibold mb-6">Send us a message</h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">First Name</label>
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm pr-10"
-                  placeholder="Enter new password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  {...register('firstName', { required: 'First name is required' })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
+                {errors.firstName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+                )}
               </div>
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+              <div>
+                <label className="block text-sm font-medium mb-1">Last Name</label>
+                <input
+                  {...register('lastName', { required: 'Last name is required' })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                {errors.lastName && (
+                  <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                type="email"
+                {...register('email', { 
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                    message: 'Invalid email address'
+                  }
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
               )}
             </div>
             
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm New Password
-              </label>
-              <div className="mt-1 relative">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  required
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm pr-10"
-                  placeholder="Confirm new password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>
+              <label className="block text-sm font-medium mb-1">Subject</label>
+              <input
+                {...register('subject', { required: 'Subject is required' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              {errors.subject && (
+                <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>
               )}
             </div>
-          </div>
-
-          <div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">Message</label>
+              <textarea
+                rows={5}
+                {...register('message', { required: 'Message is required' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              ></textarea>
+              {errors.message && (
+                <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>
+              )}
+            </div>
+            
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+              className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary transition-colors disabled:opacity-50 flex items-center"
             >
-              {loading ? 'Resetting password...' : 'Reset password'}
+              {loading ? 'Sending...' : 'Send Message'}
+              {!loading && <Send size={20} className="ml-2" />}
             </button>
+          </form>
+        </div>
+        
+        {/* Contact Information */}
+        <div>
+          <h2 className="text-2xl font-semibold mb-6">Get in touch</h2>
+          <div className="space-y-6">
+            <div className="flex items-start">
+              <MapPin size={24} className="text-primary mr-4 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-1">Address</h3>
+                <p className="text-gray-600">123 Fashion Street<br />New York, NY 10001</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <Phone size={24} className="text-primary mr-4 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-1">Phone</h3>
+                <p className="text-gray-600">+1 (555) 123-4567</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <Mail size={24} className="text-primary mr-4 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-1">Email</h3>
+                <p className="text-gray-600">info@fashionfusion.com</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <Clock size={24} className="text-primary mr-4 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-1">Business Hours</h3>
+                <p className="text-gray-600">
+                  Monday - Friday: 9:00 AM - 6:00 PM<br />
+                  Saturday: 10:00 AM - 4:00 PM<br />
+                  Sunday: Closed
+                </p>
+              </div>
+            </div>
           </div>
-        </form>
+          
+          <div className="mt-8">
+            <h3 className="font-semibold mb-4">Store Location</h3>
+            <div className="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
+              <p className="text-gray-600">Map would be displayed here</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 };
 
-export default ResetPassword;
+export default Contact;

@@ -1,71 +1,47 @@
 import api from './api';
 
 export const productService = {
-  // Get all products with optional filters
-  getProducts: async (queryParams = '') => {
-    const response = await api.get(`/products?${queryParams}`);
+  async getProducts(queryParams = '') {
+    const url = queryParams ? `/products?${queryParams}` : '/products';
+    const response = await api.get(url);
     return response.data;
   },
 
-  // Get single product
-  getProduct: async (id) => {
+  async getProduct(id) {
     const response = await api.get(`/products/${id}`);
     return response.data;
   },
 
-  // Search products
-  searchProducts: async (query, filters = {}) => {
-    const params = new URLSearchParams({ q: query, ...filters });
-    const response = await api.get(`/products/search?${params}`);
+  async searchProducts(query) {
+    const response = await api.get(`/products/search?q=${encodeURIComponent(query)}`);
     return response.data;
   },
 
-  // Get featured products
-  getFeaturedProducts: async () => {
-    const response = await api.get('/products/featured');
+  async getProductsByCategory(category, queryParams = '') {
+    const url = queryParams 
+      ? `/products/category/${category}?${queryParams}` 
+      : `/products/category/${category}`;
+    const response = await api.get(url);
     return response.data;
   },
 
-  // Get related products
-  getRelatedProducts: async (productId) => {
-    const response = await api.get(`/products/${productId}/related`);
+  async addToWishlist(productId) {
+    const response = await api.post('/wishlist/add', { productId });
     return response.data;
   },
 
-  // Get products by category
-  getProductsByCategory: async (category, filters = {}) => {
-    const params = new URLSearchParams(filters);
-    const response = await api.get(`/products/category/${category}?${params}`);
+  async removeFromWishlist(productId) {
+    const response = await api.delete(`/wishlist/remove/${productId}`);
     return response.data;
   },
 
-  // Add to wishlist
-  addToWishlist: async (productId) => {
-    const response = await api.post(`/wishlist/${productId}`);
-    return response.data;
-  },
-
-  // Remove from wishlist
-  removeFromWishlist: async (productId) => {
-    const response = await api.delete(`/wishlist/${productId}`);
-    return response.data;
-  },
-
-  // Get wishlist
-  getWishlist: async () => {
+  async getWishlist() {
     const response = await api.get('/wishlist');
     return response.data;
   },
 
-  // Create review
-  createReview: async (productId, reviewData) => {
-    const response = await api.post(`/products/${productId}/reviews`, reviewData);
-    return response.data;
-  },
-
-  // Get product reviews
-  getProductReviews: async (productId) => {
-    const response = await api.get(`/products/${productId}/reviews`);
+  async getCategories() {
+    const response = await api.get('/categories');
     return response.data;
   }
 };

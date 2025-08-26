@@ -1,115 +1,73 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/Shop/Men.jsx
+import React, { useEffect } from 'react';
 import { useProduct } from '../../context/ProductContext';
-import ProductCard from '../../components/product/ProductCard';
+import ProductGrid from '../../components/product/ProductGrid';
+import ProductFilter from '../../components/product/ProductFilter';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-// import './CategoryPage.css';
 
 const Men = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { getProductsByCategory } = useProduct();
+  const { products, loading, filters, fetchProducts, setFilters } = useProduct();
 
   useEffect(() => {
-    const fetchMenProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('Fetching men products...');
-        
-        const response = await getProductsByCategory('men');
-        console.log('Men products response:', response);
-        
-        if (response.success) {
-          setProducts(response.data);
-          console.log(`Found ${response.data.length} men's products`);
-        } else {
-          setError('Failed to load products');
-        }
-      } catch (err) {
-        console.error('Error fetching men products:', err);
-        setError('Error loading products. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetchProducts({ ...filters, category: 'men' });
+  }, [filters]);
 
-    fetchMenProducts();
-  }, [getProductsByCategory]);
+  const handleFilterChange = (newFilters) => {
+    setFilters({ ...filters, ...newFilters, page: 1 });
+  };
 
-  if (loading) {
-    return (
-      <div className="category-page">
-        <div className="container">
-          <LoadingSpinner />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="category-page">
-        <div className="container">
-          <div className="error-message">
-            <h2>Error</h2>
-            <p>{error}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleClearFilters = () => {
+    setFilters({
+      category: 'men',
+      priceRange: [0, 1000],
+      sizes: [],
+      colors: [],
+      sort: 'newest',
+      page: 1,
+      limit: 12
+    });
+  };
 
   return (
-    <div className="category-page">
-      <div className="container">
-        <div className="category-header">
-          <h1>Men's Collection</h1>
-          <p className="category-description">
-            Discover our latest men's fashion collection
-          </p>
-          <p className="product-count">
-            {products.length} product{products.length !== 1 ? 's' : ''} found
-          </p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Men's Collection</h1>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Sidebar with Filters */}
+        <div className="lg:block">
+          <ProductFilter
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onClearFilters={handleClearFilters}
+          />
         </div>
 
-        {products.length === 0 ? (
-          <div className="no-products">
-            <h2>No products found</h2>
-            <p>We couldn't find any products in the men's category.</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="btn-primary"
+        {/* Products Grid */}
+        <div className="lg:col-span-3">
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-gray-600">
+              Showing {products.length} products
+            </p>
+            
+            <select
+              value={filters.sort}
+              onChange={(e) => handleFilterChange({ sort: e.target.value })}
+              className="border rounded px-3 py-2"
             >
-              Try Again
-            </button>
+              <option value="newest">Sort by: Newest</option>
+              <option value="price-low">Sort by: Price Low to High</option>
+              <option value="price-high">Sort by: Price High to Low</option>
+              <option value="name">Sort by: Name</option>
+              <option value="rating">Sort by: Rating</option>
+            </select>
           </div>
-        ) : (
-          <div className="products-grid">
-            {products.map(product => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        )}
 
-        {/* Debug section - remove in production */}
-        <div className="debug-section" style={{ marginTop: '2rem', padding: '1rem', background: '#f5f5f5', borderRadius: '8px' }}>
-          <h3>Debug Information</h3>
-          <p><strong>Category:</strong> men</p>
-          <p><strong>Products found:</strong> {products.length}</p>
-          <p><strong>Product categories:</strong> {Array.from(new Set(products.map(p => p.category))).join(', ')}</p>
-          {products.length > 0 && (
-            <div>
-              <h4>Sample Product:</h4>
-              <pre style={{ fontSize: '12px', overflow: 'auto' }}>
-                {JSON.stringify({
-                  _id: products[0]._id,
-                  name: products[0].name,
-                  category: products[0].category,
-                  price: products[0].price
-                }, null, 2)}
-              </pre>
-            </div>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <ProductGrid products={products} />
           )}
         </div>
       </div>

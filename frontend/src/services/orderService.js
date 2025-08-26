@@ -1,39 +1,28 @@
 import api from './api';
 
 export const orderService = {
-  // Create order
-  createOrder: async (orderData) => {
+  async createOrder(orderData) {
     const response = await api.post('/orders', orderData);
     return response.data;
   },
 
-  // Get user orders
-  getUserOrders: async () => {
-    const response = await api.get('/orders');
+  async getOrders(params = {}) {
+    const response = await api.get('/orders', { params });
     return response.data;
   },
 
-  // Get order by ID
-  getOrderById: async (orderId) => {
-    const response = await api.get(`/orders/${orderId}`);
+  async getOrder(id) {
+    const response = await api.get(`/orders/${id}`);
     return response.data;
   },
 
-  // Cancel order
-  cancelOrder: async (orderId) => {
-    const response = await api.put(`/orders/${orderId}/cancel`);
+  async cancelOrder(id) {
+    const response = await api.put(`/orders/${id}/cancel`);
     return response.data;
   },
 
-  // Request return
-  requestReturn: async (orderId, reason) => {
-    const response = await api.post(`/orders/${orderId}/return`, { reason });
-    return response.data;
-  },
-
-  // Track order
-  trackOrder: async (orderId) => {
-    const response = await api.get(`/orders/${orderId}/track`);
+  async getOrderStatus(id) {
+    const response = await api.get(`/orders/${id}/status`);
     return response.data;
   }
 };

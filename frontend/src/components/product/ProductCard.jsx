@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingCart, Eye } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import { useNotification } from '../../context/NotificationContext';
 import { productService } from '../../services/productService';
-import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const { addToCart } = useCart();
+  const { addNotification } = useNotification();
 
   const handleAddToCart = async (e) => {
     e.preventDefault();
@@ -19,10 +20,6 @@ const ProductCard = ({ product }) => {
     setIsLoading(true);
     const result = await addToCart(product._id, 1);
     setIsLoading(false);
-    
-    if (result.success) {
-      toast.success('Added to cart!');
-    }
   };
 
   const handleAddToWishlist = async (e) => {
@@ -30,7 +27,10 @@ const ProductCard = ({ product }) => {
     e.stopPropagation();
     
     if (!user) {
-      toast.error('Please login to add to wishlist');
+      addNotification({
+        type: 'error',
+        message: 'Please login to add to wishlist'
+      });
       return;
     }
 
@@ -38,14 +38,23 @@ const ProductCard = ({ product }) => {
       if (isWishlisted) {
         await productService.removeFromWishlist(product._id);
         setIsWishlisted(false);
-        toast.success('Removed from wishlist');
+        addNotification({
+          type: 'success',
+          message: 'Removed from wishlist'
+        });
       } else {
         await productService.addToWishlist(product._id);
         setIsWishlisted(true);
-        toast.success('Added to wishlist');
+        addNotification({
+          type: 'success',
+          message: 'Added to wishlist'
+        });
       }
     } catch (error) {
-      toast.error('Failed to update wishlist');
+      addNotification({
+        type: 'error',
+        message: 'Failed to update wishlist'
+      });
     }
   };
 

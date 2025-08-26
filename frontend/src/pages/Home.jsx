@@ -1,186 +1,176 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useProduct } from '../context/ProductContext';
 import ProductGrid from '../components/product/ProductGrid';
+import Carousel from '../components/ui/Carousel';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import TestAddToCart from '../components/TestAddToCart';
-
 
 const Home = () => {
   const { products, loading, fetchProducts } = useProduct();
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
-    fetchProducts({ featured: true, limit: 8 });
+    fetchProducts({ limit: 8, sort: 'rating' });
   }, []);
 
-  const categories = [
-    {
-      name: "Men's Fashion",
-      image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-      link: "/men"
-    },
-    {
-      name: "Women's Fashion",
-      image: "https://images.unsplash.com/photo-1536678891919-e0e7d61a4b15?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-      link: "/women"
-    },
-    {
-      name: "Kids' Collection",
-      image: "https://images.unsplash.com/photo-1581338834647-b0fb40704e21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-      link: "/kids"
-    },
-    {
-      name: "Accessories",
-      image: "https://images.unsplash.com/photo-1591561954557-26941169b49e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-      link: "/sale?category=accessories"
+  useEffect(() => {
+    if (products.length > 0) {
+      setFeaturedProducts(products.slice(0, 4));
     }
+  }, [products]);
+
+  const carouselItems = [
+    <div key="1" className="relative h-96">
+      <img
+        src="/api/placeholder/1200/400"
+        alt="Summer Collection"
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h2 className="text-4xl font-bold mb-4">Summer Collection 2023</h2>
+          <p className="text-xl mb-6">Discover the latest trends in fashion</p>
+          <Link
+            to="/shop"
+            className="bg-primary text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-secondary transition-colors"
+          >
+            Shop Now
+          </Link>
+        </div>
+      </div>
+    </div>,
+    <div key="2" className="relative h-96">
+      <img
+        src="/api/placeholder/1200/400"
+        alt="New Arrivals"
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h2 className="text-4xl font-bold mb-4">New Arrivals</h2>
+          <p className="text-xl mb-6">Check out our latest products</p>
+          <Link
+            to="/shop?sort=newest"
+            className="bg-primary text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-secondary transition-colors"
+          >
+            Explore
+          </Link>
+        </div>
+      </div>
+    </div>,
+    <div key="3" className="relative h-96">
+      <img
+        src="/api/placeholder/1200/400"
+        alt="Sale"
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h2 className="text-4xl font-bold mb-4">Summer Sale</h2>
+          <p className="text-xl mb-6">Up to 50% off on selected items</p>
+          <Link
+            to="/sale"
+            className="bg-primary text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-secondary transition-colors"
+          >
+            View Sale
+          </Link>
+        </div>
+      </div>
+    </div>
   ];
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section */}
-      <section className="relative h-96 bg-cover bg-center" style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80')`
-      }}>
-        <div className="absolute inset-0 flex items-center justify-center text-center text-white">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Summer Collection 2023</h1>
-            <p className="text-xl mb-8">Discover the latest trends in fashion and express your unique style with our exclusive collection.</p>
-            <div className="flex justify-center space-x-4">
-              <Link to="/men" className="bg-primary hover:bg-secondary px-6 py-3 rounded-full font-medium transition duration-300">
-                Shop Men
-              </Link>
-              <Link to="/women" className="bg-primary hover:bg-secondary px-6 py-3 rounded-full font-medium transition duration-300">
-                Shop Women
-              </Link>
+    <div className="min-h-screen">
+      {/* Hero Carousel */}
+      <Carousel items={carouselItems} autoPlay={true} interval={5000} />
+      
+      {/* Featured Categories */}
+      <section className="container mx-auto px-4 py-12">
+        <h2 className="text-3xl font-bold text-center mb-8">Shop by Category</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Link to="/men" className="relative group overflow-hidden rounded-lg">
+            <img
+              src="/api/placeholder/400/300"
+              alt="Men's Collection"
+              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 className="text-2xl font-bold text-white">Men</h3>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">Shop By Category</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((category, index) => (
-            <Link
-              key={index}
-              to={category.link}
-              className="group bg-light rounded-lg overflow-hidden text-center p-6 transition-transform duration-300 hover:-translate-y-1"
-            >
-              <div className="bg-gray-200 rounded-full p-4 w-24 h-24 mx-auto flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
-                <div className="w-12 h-12 bg-cover bg-center rounded-full" style={{ backgroundImage: `url(${category.image})` }}></div>
-              </div>
-              <h3 className="font-semibold text-lg mb-2">{category.name}</h3>
-              <span className="text-primary text-sm font-medium">Explore</span>
-            </Link>
-          ))}
+          </Link>
+          <Link to="/women" className="relative group overflow-hidden rounded-lg">
+            <img
+              src="/api/placeholder/400/300"
+              alt="Women's Collection"
+              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 className="text-2xl font-bold text-white">Women</h3>
+            </div>
+          </Link>
+          <Link to="/kids" className="relative group overflow-hidden rounded-lg">
+            <img
+              src="/api/placeholder/400/300"
+              alt="Kids' Collection"
+              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+              <h3 className="text-2xl font-bold text-white">Kids</h3>
+            </div>
+          </Link>
         </div>
       </section>
 
       {/* Featured Products */}
-      <section className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">Featured Products</h2>
-          <Link to="/men" className="text-primary font-medium hover:text-secondary">
-            View All →
-          </Link>
-        </div>
-        
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
-          <ProductGrid products={products} />
-        )}
-      </section>
-
-      {/* Sale Banner */}
-      <section className="bg-primary text-white py-16 text-center">
+      <section className="bg-gray-50 py-12">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-6">Summer Sale</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">Get up to 50% off on selected items. Hurry up before the offer ends!</p>
-          
-          <div className="flex justify-center space-x-4 mb-10">
-            {['02', '18', '45', '12'].map((time, index) => (
-              <div key={index} className="bg-white bg-opacity-20 rounded-lg p-4 text-center w-20">
-                <span className="text-2xl font-bold">{time}</span>
-                <span className="block text-sm">{['Days', 'Hours', 'Minutes', 'Seconds'][index]}</span>
-              </div>
-            ))}
-          </div>
-          
-          <Link to="/sale" className="bg-white text-primary px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition duration-300">
-            Shop Now
-          </Link>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              name: "Michael Chen",
-              role: "Regular Customer",
-              image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-              text: "The quality of the clothes is exceptional. I've been shopping here for years and never been disappointed."
-            },
-            {
-              name: "Sarah Johnson",
-              role: "Fashion Blogger",
-              image: "https://images.unsplash.com/photo-1554151228-14d9def656e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=772&q=80",
-              text: "Their customer service is outstanding. They helped me choose the perfect outfit for my anniversary."
-            },
-            {
-              name: "Jessica Williams",
-              role: "New Customer",
-              image: "https://images.unsplash.com/photo-1567532939604-b6b5b0db1604?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80",
-              text: "Fast shipping and easy returns. The clothes fit perfectly and the fabric quality is much better than I expected."
-            }
-          ].map((testimonial, index) => (
-            <div key={index} className="bg-light p-6 rounded-lg">
-              <div className="flex text-yellow-400 mb-4">
-                {"★".repeat(5)}
-              </div>
-              <p className="text-gray-600 mb-4">"{testimonial.text}"</p>
-              <div className="flex items-center">
-                <img
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div className="ml-4">
-                  <h4 className="font-semibold">{testimonial.name}</h4>
-                  <p className="text-gray-600 text-sm">{testimonial.role}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="bg-cover bg-center py-16 text-white" style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80')`
-      }}>
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-6">Subscribe to Our Newsletter</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">Get the latest updates on new products, special offers, and fashion tips.</p>
-          
-          <form className="max-w-xl mx-auto flex flex-col md:flex-row gap-4">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="flex-grow px-4 py-3 rounded-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-            <button
-              type="submit"
-              className="bg-primary hover:bg-secondary px-6 py-3 rounded-full font-medium transition duration-300"
+          <h2 className="text-3xl font-bold text-center mb-8">Featured Products</h2>
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            <ProductGrid products={featuredProducts} />
+          )}
+          <div className="text-center mt-8">
+            <Link
+              to="/shop"
+              className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary transition-colors"
             >
-              Subscribe
-            </button>
-          </form>
+              View All Products
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Quality Products</h3>
+            <p className="text-gray-600">We offer only the highest quality products from trusted brands.</p>
+          </div>
+          <div className="text-center">
+            <div className="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Secure Payment</h3>
+            <p className="text-gray-600">Your payment information is protected with industry-standard encryption.</p>
+          </div>
+          <div className="text-center">
+            <div className="bg-primary rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
+            <p className="text-gray-600">Get your orders delivered quickly with our reliable shipping partners.</p>
+          </div>
         </div>
       </section>
     </div>

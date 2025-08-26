@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useCart, getCartCount } from '../../context/CartContext';
+import { useCart } from '../../context/CartContext';
 import { Search, User, Heart, ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(useState(false));
-  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false); // New state variable
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { user, logout } = useAuth();
   const { getCartCount } = useCart();
@@ -24,6 +24,7 @@ const Header = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+    setIsUserMenuOpen(false);
   };
 
   return (
@@ -47,37 +48,37 @@ const Header = () => {
               <div className="relative">
                 <button
                   className="text-neutral hover:text-primary font-medium flex items-center"
-                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)} // Use the new state variable
+                  onClick={() => setIsAdminMenuOpen(!isAdminMenuOpen)}
                 >
                   Admin <ChevronDown size={16} className="ml-1" />
                 </button>
-                {isAdminMenuOpen && ( // Use the new state variable
+                {isAdminMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-10">
                     <Link
                       to="/admin"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsAdminMenuOpen(false)} // Use the new state variable
+                      onClick={() => setIsAdminMenuOpen(false)}
                     >
                       Dashboard
                     </Link>
                     <Link
                       to="/admin/products/add"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsAdminMenuOpen(false)} // Use the new state variable
+                      onClick={() => setIsAdminMenuOpen(false)}
                     >
                       Add Product
                     </Link>
                     <Link
                       to="/admin/products"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsAdminMenuOpen(false)} // Use the new state variable
+                      onClick={() => setIsAdminMenuOpen(false)}
                     >
                       All Products
                     </Link>
                     <Link
                       to="/admin/orders"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setIsAdminMenuOpen(false)} // Use the new state variable
+                      onClick={() => setIsAdminMenuOpen(false)}
                     >
                       Orders
                     </Link>
@@ -120,7 +121,7 @@ const Header = () => {
               <div className="relative">
                 <button
                   className="flex items-center text-gray-600 hover:text-primary transition-colors"
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} // This is correct for the user menu
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 >
                   <User size={24} />
                 </button>
@@ -169,32 +170,35 @@ const Header = () => {
       
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-4 py-3 flex flex-col space-y-2">
-            <Link to="/men" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Men</Link>
-            <Link to="/women" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Women</Link>
-            <Link to="/kids" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Kids</Link>
-            <Link to="/sale" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Sale</Link>
+        <div className="md:hidden bg-white border-t">
+          <div className="px-4 py-3 flex flex-col space-y-3">
+            <Link to="/men" className="text-neutral hover:text-primary font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>Men</Link>
+            <Link to="/women" className="text-neutral hover:text-primary font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>Women</Link>
+            <Link to="/kids" className="text-neutral hover:text-primary font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>Kids</Link>
+            <Link to="/sale" className="text-neutral hover:text-primary font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>Sale</Link>
+            
             {user?.role === 'admin' && (
               <>
-                <div className="border-t border-gray-200 pt-2"></div>
-                <h4 className="text-sm font-semibold text-gray-500">Admin</h4>
-                <Link to="/admin" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-                <Link to="/admin/products/add" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Add Product</Link>
-                <Link to="/admin/products" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>All Products</Link>
-                <Link to="/admin/orders" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Orders</Link>
+                <div className="border-t border-gray-200 pt-2 mt-2"></div>
+                <h4 className="text-sm font-semibold text-gray-500 px-2 py-1">Admin</h4>
+                <Link to="/admin" className="text-neutral hover:text-primary font-medium py-2 px-2" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
+                <Link to="/admin/products/add" className="text-neutral hover:text-primary font-medium py-2 px-2" onClick={() => setIsMobileMenuOpen(false)}>Add Product</Link>
+                <Link to="/admin/products" className="text-neutral hover:text-primary font-medium py-2 px-2" onClick={() => setIsMobileMenuOpen(false)}>All Products</Link>
+                <Link to="/admin/orders" className="text-neutral hover:text-primary font-medium py-2 px-2" onClick={() => setIsMobileMenuOpen(false)}>Orders</Link>
               </>
             )}
+            
             {!user && (
-              <Link to="/login" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+              <Link to="/login" className="text-neutral hover:text-primary font-medium py-2" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
             )}
+            
             {user && (
               <>
-                <div className="border-t border-gray-200 pt-2"></div>
-                <h4 className="text-sm font-semibold text-gray-500">Account</h4>
-                <Link to="/profile" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
-                <Link to="/orders" className="text-neutral hover:text-primary font-medium" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
-                <button onClick={handleLogout} className="w-full text-left text-neutral hover:text-primary font-medium">Logout</button>
+                <div className="border-t border-gray-200 pt-2 mt-2"></div>
+                <h4 className="text-sm font-semibold text-gray-500 px-2 py-1">Account</h4>
+                <Link to="/profile" className="text-neutral hover:text-primary font-medium py-2 px-2" onClick={() => setIsMobileMenuOpen(false)}>My Profile</Link>
+                <Link to="/orders" className="text-neutral hover:text-primary font-medium py-2 px-2" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+                <button onClick={handleLogout} className="w-full text-left text-neutral hover:text-primary font-medium py-2 px-2">Logout</button>
               </>
             )}
           </div>

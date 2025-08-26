@@ -18,14 +18,19 @@ app.use(limiter);
 
 // Middleware
 // CORS configuration
+// In your backend server (app.js or server.js)
+
+
 const corsOptions = {
   origin: [
-    "http://localhost:5173", // for local development
-    "https://your-netlify-site.netlify.app" // replace with your actual Netlify domain
+    'http://localhost:5173',                     // Vite dev server
+    'https://fashionfusionadarsh.netlify.app',  // Your Netlify frontend
+    'https://*.netlify.app'                      // Any Netlify subdomain (optional)
   ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  credentials: true, // allow cookies, authorization headers
 };
+
+app.use(cors(corsOptions));
 
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));

@@ -1,16 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/authService';
-import toast from 'react-hot-toast';
+import { useNotification } from './NotificationContext';
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { addNotification } = useNotification();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -44,11 +49,22 @@ export const AuthProvider = ({ children }) => {
       authService.setAuthToken(token);
       setUser(userData);
       
-      toast.success('Login successful!');
+      addNotification({
+        type: 'success',
+        title: 'Login Successful',
+        message: 'Welcome back to FashionFusion!'
+      });
+      
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || 'Login failed';
-      toast.error(message);
+      
+      addNotification({
+        type: 'error',
+        title: 'Login Failed',
+        message: message
+      });
+      
       return { success: false, message };
     }
   };
@@ -62,11 +78,22 @@ export const AuthProvider = ({ children }) => {
       authService.setAuthToken(token);
       setUser(user);
       
-      toast.success('Registration successful!');
+      addNotification({
+        type: 'success',
+        title: 'Registration Successful',
+        message: 'Your account has been created successfully!'
+      });
+      
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || 'Registration failed';
-      toast.error(message);
+      
+      addNotification({
+        type: 'error',
+        title: 'Registration Failed',
+        message: message
+      });
+      
       return { success: false, message };
     }
   };
@@ -75,7 +102,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     authService.removeAuthToken();
     setUser(null);
-    toast.success('Logged out successfully');
+    
+    addNotification({
+      type: 'success',
+      message: 'Logged out successfully'
+    });
   };
 
   const updateProfile = (userData) => {
